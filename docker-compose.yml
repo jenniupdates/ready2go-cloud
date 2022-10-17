@@ -1,0 +1,432 @@
+version: '3.8'
+
+volumes:
+    rabbitmq_data:
+    pgdata: 
+    kongadata:
+
+networks:
+    kong-net:
+        driver: bridge
+
+# Services [ <service name> : <port(s)> ]:
+#     - rabbitmq:5672:15672 (RabbitMQ)
+#     - kong-database:5432 (Postgres - Kong)
+#     - kong-migration (Prepare Database - Kong)
+#     - kong:8000 (Kong)
+#     - konga:1337 (Kong GUI)
+
+# HTTP-based services:
+#     Atomic:
+#         - order:5000
+#         - activityhttp:5001
+#         - shipper:5002
+#         - rate:5003
+#         - droppoint:5004
+#         - valuing:5005
+#     Composite:
+#         - pick_parcel:5006
+#         - create_order:5007
+#         - update_order:5008
+#         - cancel_order:5009
+
+# AMQP-based services (Atomic):
+#     - activity
+#     - send_sms:5566
+#     - email:9000
+
+services:
+    ##################################
+    # RabbitMQ: The messaging broker #
+    ##################################
+    rabbitmq:
+        image: rabbitmq:3-management
+        hostname: camel-rabbitmq
+        restart: always
+        networks:
+            - kong-net
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes: 
+            - rabbitmq_data:/var/lib/rabbitmq
+
+    #######################################
+    # Postgres: The database used by Kong #
+    #######################################
+    kong-database:
+        image: postgres:9.6
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            POSTGRES_DB: kong
+            POSTGRES_USER: kong
+            POSTGRES_PASSWORD: password
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "kong"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+    ###########################
+    # Kong database migration #
+    ###########################
+    kong-migration:
+        image: kong:2.0.4
+        command: "kong migrations bootstrap"
+        restart: on-failure
+        networks:
+            - kong-net
+        environment:
+            KONG_DATABASE: postgres
+            KONG_PG_HOST: kong-database
+            KONG_PG_USER: kong
+            KONG_PG_PASSWORD: password
+        depends_on:
+            - kong-database
+
+    #########################
+    # Kong: The API Gateway #
+    #########################
+    kong:
+        image: kong:2.0.4
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            KONG_DATABASE: postgres
+            KONG_PG_HOST: kong-database
+            KONG_PG_USER: kong
+            KONG_PG_PASSWORD: password
+            KONG_PROXY_LISTEN: 0.0.0.0:8000
+            KONG_ADMIN_LISTEN: 0.0.0.0:8001
+        depends_on:
+            - kong-migration
+        ports:
+            - "8000:8000"
+
+    ###################
+    # Konga: Kong GUI #
+    ###################
+    konga:
+        image: pantsel/konga
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            DB_ADAPTER: postgres
+            DB_HOST: kong-database
+            DB_USER: kong
+            DB_PASSWORD: password
+            DB_DATABASE: konga_db
+        depends_on:
+            - kong
+        ports:
+            - "1337:1337"
+        volumes:
+            - kongadata:/app/kongadata
+
+    #################################
+    # Order: The Order microservice #
+    #################################
+    order:
+        build:
+            context: ./
+            dockerfile: order.Dockerfile
+        image: 889090/order:1.0
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            dbURL: mysql+mysqlconnector://is213@host.docker.internal:3306/camelDB
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5000:5000"
+
+    ########################################################
+    # Activityhttp: The Activity Log Consumer microservice #
+    ########################################################
+    activityhttp:
+        build:
+            context: ./
+            dockerfile: activityhttp.Dockerfile
+        image: 889090/activityhttp:1.0
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            dbURL: 'mysql+mysqlconnector://is213@host.docker.internal:3306/camelDB'
+            PYTHONUNBUFFERED: 1
+        depends_on:
+            - kong
+        # ports:
+        #     - "5001:5001"
+
+    #####################################
+    # Shipper: The Shipper microservice #
+    #####################################
+    shipper:
+        build:
+            context: ./
+            dockerfile: shipper.Dockerfile
+        image: 889090/shipper:1.0
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            dbURL: mysql+mysqlconnector://is213@host.docker.internal:3306/camelDB
+            PYTHONUNBUFFERED: 1
+        depends_on:
+            - kong
+        # ports:
+        #     - "5002:5002"
+
+    ###############################
+    # Rate: The Rate microservice #
+    ###############################
+    rate:
+        build:
+            context: ./
+            dockerfile: rate.Dockerfile
+        image: 889090/rate:1.0
+        restart: always
+        networks:
+            - kong-net
+        environment:
+            dbURL: mysql+mysqlconnector://is213@host.docker.internal:3306/camelDB
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5003:5003"
+
+    #####################################
+    # Valuing: The Valuing microservice #
+    #####################################
+    valuing:
+        build:
+            context: ./
+            dockerfile: valuing.Dockerfile
+        image: 889090/valuing:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - order
+            - rate
+            - kong
+        environment:
+            order_URL: http://order:5000/order
+            rate_URL: http://rate:5003/rate
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5005:5005"
+
+    ###########################################################
+    # Pick Parcel: Picking parcel drop-off point microservice #
+    ###########################################################
+    pick_parcel:
+        build:
+            context: ./
+            dockerfile: pick_parcel.Dockerfile
+        image: 889090/pick_parcel:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - droppoint
+            - order
+            - shipper
+            - email
+            - activity
+            - rabbitmq
+            - kong
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            # Links to be updated
+            order_URL: "http://order:5000/order"
+            shipper_URL: "http://shipper:5002/shipper"
+            # droppoint_URL: "http://localhost:5004/droppoint"
+            # email_URL: "http://localhost:9000/email"
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5006:5006"
+
+    ########################################################
+    # Create Order: The Create Delivery Order microservice #
+    ########################################################
+    create_order:
+        build:
+            context: ./
+            dockerfile: create_order.Dockerfile
+        image: 889090/create_order:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - activity
+            - order
+            - shipper
+            - send_sms
+            - email
+            - rabbitmq
+            - kong
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            order_URL: http://order:5000/order
+            shipper_URL: http://shipper:5002/shipper
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5007:5007"
+
+    ########################################################
+    # Update Order: The Activity Log Consumer microservice #
+    ########################################################
+    update_order:
+        build:
+            context: ./
+            dockerfile: update_order.Dockerfile
+        image: 889090/update_order:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - order
+            - activity
+            - rabbitmq
+            - send_sms
+            - email
+            - kong
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            order_URL: http://order:5000/order
+            shipper_URL: http://shipper:5002/shipper
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5008:5008"
+
+    #########################################
+    # Update Order: The Update microservice #
+    #########################################
+    cancel_order:
+        build:
+            context: ./
+            dockerfile: cancel_order.Dockerfile
+        image: 889090/cancel_order:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - order
+            - activity
+            - rabbitmq
+            - send_sms
+            - email
+            - kong
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            order_URL: http://order:5000/order
+            shipper_URL: http://shipper:5002/shipper
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5009:5009"
+
+    #####################################################
+    # Activity: The Activity Log Consumber microservice #
+    #####################################################
+    activity:
+        build:
+            context: ./
+            dockerfile: activity.Dockerfile
+        image: 889090/activity:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - rabbitmq
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            dbURL: mysql+mysqlconnector://is213@host.docker.internal:3306/camelDB
+            PYTHONUNBUFFERED: 1
+
+    ######################################
+    # SMS: The SMS Consumer microservice #
+    ######################################
+    send_sms:
+        build:
+            context: ./
+            dockerfile: send_sms.Dockerfile
+        image: 889090/send_sms:2.1
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - rabbitmq
+            - activity
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "5566:5566"
+
+    ##########################################
+    # Email: The Email Consumer microservice #
+    ##########################################
+    email:
+        build:
+            context: ./
+            dockerfile: email.Dockerfile
+        image: 889090/email_test:1.0
+        restart: always
+        networks:
+            - kong-net
+        depends_on:
+            - rabbitmq
+            - activity
+        environment:
+            rabbit_host: camel-rabbitmq
+            rabbit_port: 5672
+            PYTHONUNBUFFERED: 1
+        # ports:
+        #     - "9000:9000"
+
+    ##########################################
+    # Drop Point db: The Drop Point Database #
+    ##########################################
+    db:
+        image: mysql:5.7
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: camelDB
+            MYSQL_USER: is213
+            MYSQL_PASSWORD:
+        ports:
+            - "9906:3306"
+
+    ###############################################
+    # Drop Point: The Drop Off Point microservice #
+    ###############################################
+    droppoint:
+        image: php:7.2.2-apache
+        build:
+            context: ./
+            dockerfile: droppointPHP.Dockerfile
+        networks: 
+            - kong-net
+        depends_on:
+            - db
+        volumes:
+            - ./php:/var/www/html/
+        ports:
+            - "5004:80"
+        stdin_open: true
+        tty: true
