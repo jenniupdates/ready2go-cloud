@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Ready2Go - Delivery order management platform</title>
+
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+			referrerpolicy="no-referrer"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/daisyui/2.39.0/full.min.css"
+			integrity="sha512-nCBKexw7RhBTIYCgzK1Ykep8de2n1InClRi4lhMlJs86YVP7UFNEQei+p0IwG4eHFfn+IGj67Oe8U/0f96Gq6Q=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+	</head>
+	<body>
+		<div class="navbar bg-base-100">
+			<div class="navbar-start">
+				<a class="btn btn-ghost normal-case text-xl">Ready2Go</a>
+			</div>
+			<div class="navbar-center hidden lg:flex"></div>
+			<div class="navbar-end"></div>
+		</div>
+
+		<div class="hero min-h-screen bg-base-200">
+			<div class="hero-content text-center">
+				<div class="max-w-md">
+					<h1 class="text-5xl font-bold">Delivery platform</h1>
+					<p class="py-6">
+						Ready2Go is a delivery platform that allows you to manage your
+						orders and deliveries.
+					</p>
+					<button
+						class="btn btn-primary"
+						onclick="document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });"
+					>
+						Get Started
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<section id="order-section" class="container mx-auto py-6">
+			<h1 class="text-5xl font-bold">Pending orders</h1>
+			<div id="order-list"></div>
+		</section>
+
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+			integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		></script>
+		<script src="/js/pending-orders.js"></script>
+	</body>
+</html>
