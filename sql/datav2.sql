@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS ready2go;
 CREATE DATABASE ready2go;
 use ready2go;
 
-CREATE TABLE IF NOT EXISTS order (
+CREATE TABLE IF NOT EXISTS `order` (
     trackingID int not null AUTO_INCREMENT, 
     orderID int not null,
     merchantID int not null,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS order (
     PRIMARY KEY (trackingID)
 );
 
-CREATE TABLE IF NOT EXISTS order_activities (
+CREATE TABLE IF NOT EXISTS `order_activities` (
     trackingID int not null,
     orderID int not null,
     orderStatus int not null,
@@ -26,22 +26,22 @@ CREATE TABLE IF NOT EXISTS order_activities (
     nextDestination varchar(200) not null,
     deliveryManID int, 
     PRIMARY KEY (trackingID, orderID, orderStatus),
-    FOREIGN KEY (trackingID, orderID, orderStatus) REFERENCES order(trackingID, orderID, orderStatus)
+    CONSTRAINT FK_OrderShipmentProcess FOREIGN KEY (trackingID) REFERENCES `order` (trackingID)
 );
 
-CREATE TABLE IF NOT EXISTS order_status (
+CREATE TABLE IF NOT EXISTS `order_status` (
     orderStatusID int not null,
     orderStatusDescription varchar(60) not null,
     PRIMARY KEY (orderStatusID)
 );
 
-CREATE TABLE IF NOT EXISTS merchants (
+CREATE TABLE IF NOT EXISTS `merchants` (
     merchantID int not null, 
     merchantName varchar(100) not null,
     PRIMARY KEY (merchantID)
 );
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS `users` (
     userID int not null,
     password varchar(64) not null, 
     email varchar(100) not null,
