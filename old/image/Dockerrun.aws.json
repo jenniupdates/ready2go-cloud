@@ -1,0 +1,9 @@
+{
+	"AWSEBDockerrunVersion": "1",
+	"Image": {
+    "Name": "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/ready2go-order:0.3"
+  },
+  "Ports": [
+    { "ContainerPort": "80" }
+  ]
+}
