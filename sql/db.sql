@@ -3,8 +3,8 @@ CREATE DATABASE ready2go;
 use ready2go;
 
 CREATE TABLE IF NOT EXISTS orders (
-    trackingID int not null AUTO_INCREMENT, 
-    orderID int not null,
+    trackingID varchar(64) not null, 
+    merchantorderID int not null,
     merchantID int not null,
     merchantName varchar(100) not null,
     customerID int not null,
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 CREATE TABLE IF NOT EXISTS order_activities (
-    trackingID int not null,
-    orderID int not null,
+    trackingID varchar(64) not null,
+    merchantorderID int not null,
     orderStatus int not null,
     orderStatusDatetime datetime not null,
     deliveryManID int, 
