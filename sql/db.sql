@@ -4,7 +4,7 @@ use ready2go;
 
 CREATE TABLE IF NOT EXISTS orders (
     trackingID varchar(64) not null, 
-    merchantorderID int not null,
+    merchantOrderID int not null,
     merchantID int not null,
     merchantName varchar(100) not null,
     customerID int not null,
@@ -18,11 +18,11 @@ CREATE TABLE IF NOT EXISTS orders (
 
 CREATE TABLE IF NOT EXISTS order_activities (
     trackingID varchar(64) not null,
-    merchantorderID int not null,
+    merchantOrderID int not null,
     orderStatus int not null,
     orderStatusDatetime datetime not null,
     deliveryManID int, 
-    PRIMARY KEY (trackingID, orderID, orderStatus),
+    PRIMARY KEY (trackingID, merchantOrderID, orderStatus),
     FOREIGN KEY (trackingID) REFERENCES orders (trackingID)
 );
 
