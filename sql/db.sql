@@ -46,3 +46,8 @@ CREATE TABLE IF NOT EXISTS users (
     PRIMARY KEY (userID)
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+    roleID int not null,
+    roleDescription varchar(64) not null,
+    PRIMARY KEY (roleID)
+);

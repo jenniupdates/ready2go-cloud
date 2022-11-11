@@ -33,4 +33,10 @@ VALUES
   (1,'Shopee'),
   (2,'Amazon');
 
--- no data inserted into Users because need go through encryption.
+-- not much data inserted into Users because need go through encryption. 
+
+INSERT INTO `users` (`userID`, `email`, `password`, `role`)
+VALUES 
+  (15, 'driver1-ready2go@gmail.com', '$2a$06$AuxMcpN2oTUO0n9I.QPrBOt7I35AK/Z0tB6075P4Ee5YQQCyCw29y', 2),
+  (1, 'admin', '$2a$06$JLRvhnWezd4TwfzNYU1ayO3sWihuKtGzNZ3yt54H2a/IL4jCt4yKG', 0),
+  (2, 'ITstaff-shopee@shopee.com', '$2a$06$DAFm9xJX2FjYneAhPfEIseKMOvblZoFg39cyAB3wHaLn9M2p0/7zC', 1);
