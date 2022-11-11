@@ -1,6 +1,6 @@
 use ready2go;
 
-INSERT INTO `orders` (`trackingID`,`orderID`,`merchantID`,`merchantName`,`customerID`,
+INSERT INTO `orders` (`trackingID`,`merchantOrderID`,`merchantID`,`merchantName`,`customerID`,
 `customerAddress`,`sellerID`,`sellerAddress`,`orderStatus`,`orderCreation`)
 VALUES
   (1,9,1,"Shopee",5,"Ap #504-3075 Dolor Rd.",35,"Ap #373-1658 Enim. Street",0,'2022-11-01 01:03:14'),
@@ -10,7 +10,7 @@ VALUES
   (5,4,2,"Amazon",3,"Ap #918-1431 Per St.",36,"173-4139 Curabitur Rd.",5,'2022-11-11 03:02:23');
 
 
-INSERT INTO `order_activities` (`trackingID`,`orderID`,`orderStatus`,`orderStatusDatetime`,`deliveryManID`)
+INSERT INTO `order_activities` (`trackingID`,`merchantOrderID`,`orderStatus`,`orderStatusDatetime`,`deliveryManID`)
 VALUES  
   (3,5,0,"2022-11-05 11:22:49",null),
   (3,5,1,"2022-11-06 12:29:50",15),
