@@ -5,10 +5,7 @@ services:
     ports:
       - "80:80"
   new-relic:
-    container_name: newrelic-infra
-    build:
-      context: .
-      dockerfile: ./new-relic/Dockerfile
+    image: "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/new-relic:0.1"
     cap_add:
       - SYS_PTRACE
     network_mode: host
@@ -17,5 +14,3 @@ services:
     volumes:
       - "/:/host:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
-    
-
