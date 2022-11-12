@@ -4,3 +4,18 @@ services:
     image: "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/ready2go-order:0.7"
     ports:
       - "80:80"
+  new-relic:
+    container_name: newrelic-infra
+    build:
+      context: .
+      dockerfile: ./new-relic/Dockerfile
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    
+
