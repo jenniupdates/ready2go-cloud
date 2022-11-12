@@ -1,9 +1,15 @@
 version: "3.8"
+
 services:
   nginx-server:
+    container_name: nginx-server
     image: "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/ready2go-order:0.7"
     ports:
       - "80:80"
+    build:
+      context: .
+      dockerfile: Dockerfile
+
   new-relic:
     image: "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/new-relic:0.1"
     cap_add:
