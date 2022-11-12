@@ -1,4 +1,7 @@
 const application = {
+	TRACK_PARCEL_ENDPOINT:
+		"https://xphvj4owp3.execute-api.ap-southeast-1.amazonaws.com/prod",
+
 	init: function () {
 		$("#tracking-form").submit((event) => {
 			event.preventDefault()
@@ -11,16 +14,22 @@ const application = {
 		const orders = await this.getParcelAsync(trackingNumber)
 
 		orders.forEach((order) => {
-			const { orderId, merchantName, nextDestination, datetime, status } = order
+			const {
+				trackingID,
+				merchantOrderID,
+				orderStatus,
+				orderStatusDatetime,
+				deliveryManID,
+			} = order
 
 			const itemElement = this.getOrderItemTemplate(
-				`<div class="badge">${status}</div> #${orderId} - ${datetime}`,
+				`<div class="badge">${orderStatus}</div> #${trackingID} - ${orderStatusDatetime}`,
 				`
-					<label class="font-bold">Destination</label>
-					<p class="mb-4">${nextDestination}</p>
+					<label class="font-bold">Delivery ID</label>
+					<p class="mb-4">${deliveryManID}</p>
 	
-					<label class="font-bold">Merchant</label>
-					<p>${merchantName}</p>
+					<label class="font-bold">Merchant ID</label>
+					<p>${merchantOrderID}</p>
 				`
 			)
 
@@ -50,8 +59,12 @@ const application = {
 	getParcelAsync: async function (trackingId) {
 		// TODO: Handle retrieval from endpoint
 
-		const responseString = '[{"orderId":"order-id-1","merchantName":"merchant-id-1","nextDestination":"destination 1","datetime":"2021-01-01 12:00:00","status":"pending"},{"orderId":"order-id-2","merchantName":"merchant-id-2","nextDestination":"destination 2","datetime":"2021-01-01 12:00:00","status":"delivered"}]'
-		return JSON.parse(responseString)
+		try {
+			const response = await fetch(this.TRACK_PARCEL_ENDPOINT)
+			return await response.json()
+		} catch (e) {
+			console.error("an error has occurred", e)
+		}
 	},
 }
 
