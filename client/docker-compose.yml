@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  nginx-server:
+    image: "267157074835.dkr.ecr.ap-southeast-1.amazonaws.com/ready2go-order:0.7"
+    ports:
+      - "80:80"
