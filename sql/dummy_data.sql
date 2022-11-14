@@ -20,7 +20,7 @@ VALUES
 
 INSERT INTO `order_status` (`orderStatusID`,`orderStatusDescription`)
 VALUES
-  (0,'unfulfilled'),
+  (0,'unaccepted'),
   (1,'accepted'),
   (2,'dispatched'),
   (3,'transit'),
