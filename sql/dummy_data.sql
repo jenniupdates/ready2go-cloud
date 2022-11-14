@@ -10,13 +10,13 @@ VALUES
   (5,4,2,"Amazon",3,"Ap #918-1431 Per St.",36,"173-4139 Curabitur Rd.",5,'2022-11-11 03:02:23');
 
 
-INSERT INTO `order_activities` (`trackingID`,`merchantOrderID`,`orderStatus`,`orderStatusDatetime`,`deliveryManID`)
+INSERT INTO `order_activities` (`trackingID`,`merchantOrderID`,`merchantID`,`orderStatus`,`orderStatusDatetime`,`deliveryManID`)
 VALUES  
-  (3,5,0,"2022-11-05 11:22:49",null),
-  (3,5,1,"2022-11-06 12:29:50",15),
-  (3,5,2,"2022-11-07 15:26:59",15),
-  (3,5,3,"2021-11-09 10:21:06",15),
-  (3,5,4,"2022-11-11 01:03:14",15);
+  (3,5,1,0,"2022-11-05 11:22:49",null),
+  (3,5,1,1,"2022-11-06 12:29:50",15),
+  (3,5,1,2,"2022-11-07 15:26:59",15),
+  (3,5,1,3,"2021-11-09 10:21:06",15),
+  (3,5,1,4,"2022-11-11 01:03:14",15);
 
 INSERT INTO `order_status` (`orderStatusID`,`orderStatusDescription`)
 VALUES
@@ -40,3 +40,12 @@ VALUES
   (15, 'driver1-ready2go@gmail.com', '$2a$06$AuxMcpN2oTUO0n9I.QPrBOt7I35AK/Z0tB6075P4Ee5YQQCyCw29y', 2),
   (1, 'admin', '$2a$06$JLRvhnWezd4TwfzNYU1ayO3sWihuKtGzNZ3yt54H2a/IL4jCt4yKG', 0),
   (2, 'ITstaff-shopee@shopee.com', '$2a$06$DAFm9xJX2FjYneAhPfEIseKMOvblZoFg39cyAB3wHaLn9M2p0/7zC', 1);
+
+
+DELIMITER $$
+CREATE TRIGGER after_new_order_insert AFTER INSERT ON orders
+FOR EACH ROW
+BEGIN
+	INSERT INTO order_activities VALUES (new.trackingID, new.merchantOrderID, new.merchantID, new.orderStatus, new.orderCreation, null);
+END $$
+DELIMITER ;

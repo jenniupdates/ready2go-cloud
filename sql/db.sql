@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_activities (
     trackingID varchar(64) not null,
     merchantOrderID int not null,
+    merchantID int not null,
     orderStatus int not null,
     orderStatusDatetime datetime not null,
     deliveryManID int, 
