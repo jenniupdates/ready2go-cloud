@@ -17,21 +17,22 @@ const application = {
 			const {
 				trackingID,
 				merchantOrderID,
-				orderStatus,
-				orderStatusDatetime,
-				deliveryManID,
+				merchantName,
+				orderStatusDescription,
+				orderStatusDate,
+				orderStatusTime,
 			} = order
 
-			const itemElement = this.getOrderItemTemplate(
-				`<div class="badge">${orderStatus}</div> #${trackingID} - ${orderStatusDatetime}`,
-				`
-					<label class="font-bold">Delivery ID</label>
-					<p class="mb-4">${deliveryManID}</p>
-	
-					<label class="font-bold">Merchant ID</label>
-					<p>${merchantOrderID}</p>
-				`
-			)
+			const itemElement = this.getOrderItemTemplate(`<div class="badge">${orderStatusDescription}</div> #${trackingID}`, `
+				<label class="font-bold">Merchant</label>
+				<p class="mb-4">
+					<span class="badge badge-outline">merchant-${merchantOrderID}</span>
+					${merchantName}
+				</p>
+
+				<label class="font-bold">Order Date</label>
+				<p class="mb-4">${orderStatusDate} - ${orderStatusTime}</p>
+			`)
 
 			$("#order-list").append(itemElement)
 		})
@@ -57,11 +58,15 @@ const application = {
 	},
 
 	getParcelAsync: async function (trackingId) {
-		// TODO: Handle retrieval from endpoint
-
 		try {
-			const response = await fetch(this.TRACK_PARCEL_ENDPOINT)
-			return await response.json()
+			const response = await fetch(
+				`${this.TRACK_PARCEL_ENDPOINT}?trackingID=${trackingId}`
+			)
+			const result = (await response.text())
+				.replace(/'/g, '"')
+				.replace(/None/g, null)
+
+			return JSON.parse(result)
 		} catch (e) {
 			console.error("an error has occurred", e)
 		}

@@ -1,4 +1,7 @@
 const application = {
+	TRACK_PARCEL_ENDPOINT:
+		"https://n2t1ei2vci.execute-api.ap-southeast-1.amazonaws.com/prod",
+
 	init: async function () {
 		const orders = await this.getOrdersAsync()
 
@@ -29,7 +32,7 @@ const application = {
 
 	getOrderItemTemplate: function (title, body) {
 		return `
-      <div class="card bg-base-100 shadow-md mt-4">
+      <div class="card bg-base-200 shadow-md mt-4">
         <div class="card-body">
           <h2 class="card-title">${title}</h2>
           <div>
@@ -45,7 +48,7 @@ const application = {
 	},
 
 	getOrdersAsync: async function () {
-		const response = await fetch("https://n2t1ei2vci.execute-api.ap-southeast-1.amazonaws.com/prod")
+		const response = await fetch(this.TRACK_PARCEL_ENDPOINT)
 		const result = (await response.text()).replace(/'/g, '"')
 		return JSON.parse(result)
 	},
