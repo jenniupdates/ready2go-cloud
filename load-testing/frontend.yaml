@@ -1,0 +1,10 @@
+config:
+  target: https://dx8z50pq6g1b7.cloudfront.net
+  phases:
+    - duration: 600
+      arrivalRate: 50
+
+scenarios:
+  - flow:
+    - get:
+        url: /index.html
