@@ -24,8 +24,12 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          ECR_WEB_REPOSITORY: ${{ secrets.WEB_REPO_NAME }}
+          ECR_NEW_RELIC_REPOSITORY: ${{ secrets.NEW_RELIC_REPO_NAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -f client/Dockerfile -t $ECR_REGISTRY/$ECR_WEB_REPOSITORY:$IMAGE_TAG .
+          docker build -f client/new-relic/Dockerfile -t $ECR_REGISTRY/$ECR_NEW_RELIC_REPOSITORY:$IMAGE_TAG .
+
+          docker push $ECR_REGISTRY/$ECR_WEB_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_NEW_RELIC_REPOSITORY:$IMAGE_TAG
