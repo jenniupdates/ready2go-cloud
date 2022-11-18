@@ -1,5 +1,5 @@
 config:
-  target: https://is458ready2go.com/
+  target: https://0v6jgfpbw6.execute-api.ap-southeast-1.amazonaws.com/prod
   phases:
     # The first phase is a slow ramp-up phase to warm up the backend. This phase will send five virtual users to your backend every second for 60 seconds.
     - duration: 60
@@ -11,13 +11,24 @@ config:
       arrivalRate: 5
       rampTo: 50
       name: Ramp up load
-    # The final phase simulates a sustained spike of 50 virtual users every second for the next ten minutes.
+    # The final phase simulates a sustained spike of 100 virtual users every second for the next 5 minutes.
     # This phase is meant to stress test your backend to check the system's sustainability over a more extended period.
     - duration: 300
       arrivalRate: 50
       name: Sustained load
+  defaults:
+    headers:
+      x-api-key: JX80PwmqmD6pa6ZBea4d93XYePoPxcsr6MWHlctb
 
 scenarios:
   - flow:
-    - get:
-        url: /index.html
+    - post:
+        url: /
+        json:
+          {
+            "merchantOrderID": 321,
+            "customerID": 123,
+            "customerAddress": "destination address",
+            "sellerID": 123,
+            "sellerAddress": "pickup address"
+          }
