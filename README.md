@@ -2,7 +2,7 @@
 <TBC description>
 
 ## Cloud Setup (AWS)
-![Architecture Diagram]([http://url/to/img.png](https://drive.google.com/file/d/11Sjcm6tObikl8q3ekcULsedJaTgLOwOW/view?usp=sharing))
+![Architecture Diagram](http://url/to/img.png]](https://drive.google.com/file/d/11Sjcm6tObikl8q3ekcULsedJaTgLOwOW/view?usp=sharing)
 
 ## Entering the RDS database
 ### via terminal
