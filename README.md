@@ -1,9 +1,9 @@
 # Ready2Go
-<TBC description>
+TBC description
 
 ## Cloud Setup (AWS)
-![Architecture Diagram](https://imgur.com/27ZCWMM)
-
+![Architecture Diagram](https://i.imgur.com/27ZCWMM.png)
+    
 ## Entering the RDS database
 ### via terminal
 1. Enter bastion host env (to then enter rds): `ssh -i "RDSKeyPair.pem" ec2-user@ec2-52-77-7-47.ap-southeast-1.compute.amazonaws.com` (note that this assume you already in the directory same as the pem key file)
