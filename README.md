@@ -1,6 +1,7 @@
 # Ready2Go 
+A logistics web application hosted on the AWS cloud.
 
-## Company 
+## Company Background
 Ready2Go is a logistics company who  manages delivery for its customers,  consisting of smaller delivery requestors  in the Asia-Pacific region and parts of  North America. Business has been growing  steadily for quite a while.
 
 However, Ready2Go wants to expand to cater for  bigger customers such as huge e-commerce giants  like Shopee who require larger and more frequent  deliveries in both current and EU market.
