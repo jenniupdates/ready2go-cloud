@@ -1,5 +1,5 @@
 # Ready2Go 
-A logistics web application hosted on the AWS cloud.
+A logistics web application hosted on AWS cloud.
 
 ## Company Background
 Ready2Go is a logistics company who  manages delivery for its customers,  consisting of smaller delivery requestors  in the Asia-Pacific region and parts of  North America. Business has been growing  steadily for quite a while.
